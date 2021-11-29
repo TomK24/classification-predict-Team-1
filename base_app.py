@@ -46,11 +46,21 @@ def main():
 
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
-	options = ["Prediction", "Information"]
+	options = ["Exploratory Data Analysis","Data Engineering", "Prediction", "Model Information"]
 	selection = st.sidebar.selectbox("Choose Option", options)
+	
+	#Building out the 'EDA' page
+	if selection == 'Exploratory Data Analysis':
+		st.info("Information on how we did the EDA")
+		st.markdown("Some information here")
+	
+	#Building out the "Data Engineering page"
+	if selection == 'Data Engineering':
+		st.info("How is data processed before being sent to the chosen model?")
+		st.markdown("Step one: Remove punctuation")
 
 	# Building out the "Information" page
-	if selection == "Information":
+	if selection == "Model Information":
 		st.info("General Information")
 		# You can read a markdown file from supporting resources folder
 		st.markdown("Some information here")
@@ -64,6 +74,9 @@ def main():
 		st.info("Prediction with ML Models")
 		# Creating a text box for user input
 		tweet_text = st.text_area("Enter Text","Type Here")
+
+		options = ["Model 1","Model 2", "Model 3", "Model 4"]
+		selection = st.selectbox("Choose Model", options)
 
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
