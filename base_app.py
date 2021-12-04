@@ -31,10 +31,22 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pickle
+
+import re
 
 # Vectorizer
 news_vectorizer = open("resources/tfidfvect.pkl","rb")
 tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
+
+# New Vectorizer we'll actually be using
+tweet_vectorizer = open("models+vectors/vector_1.pkl","rb")
+vect = joblib.load(tweet_vectorizer)
+
+# Section to load models
+cnb = pickle.load(open("models+vectors/CNB_model.pkl", 'rb'))
+svc = pickle.load(open("models+vectors/SVC_model.pkl", 'rb'))
+mlr = pickle.load(open("models+vectors/MLR_model.pkl", 'rb'))
 
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
@@ -54,6 +66,31 @@ def convert_sent(val):
         return 'News'
 df["sentiment"] = df["sentiment"].apply(convert_sent)
 df.head()
+
+def preprocess1(tweet):
+    '''Method for pre-processing a single tweet entered using the text box'''
+    pattern_url = r'http[s]?://(?:[A-Za-z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9A-Fa-f][0-9A-Fa-f]))+'
+    normal_chars = 'abcdefghijklmnopqrstuvwxyz0123456789 '
+    tweet2 = re.sub(pattern_url, 'url-web', tweet)
+    tweet3 = tweet2.lower()
+    tweet_4 = ''.join([l for l in tweet3 if l in normal_chars])
+    np_tweet = np.array([tweet_4])
+    return tweet_4
+
+def preprocess2(data):
+    '''Method for pre-processing an uploaded csv file. Takes a dataframe as input and returns one as output'''
+    def remove_weird_chars(post):
+        return ''.join([l for l in post if l in normal_chars])
+    pattern_url = r'http[s]?://(?:[A-Za-z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9A-Fa-f][0-9A-Fa-f]))+'
+    normal_chars = 'abcdefghijklmnopqrstuvwxyz0123456789 '
+    subs_url = r'url-web'
+    data['message'] = data['message'].replace(to_replace = pattern_url, value = subs_url, regex = True)
+    data['message'] = data['message'].str.lower()
+    data['message'] = data['message'].apply(remove_weird_chars)
+    return data
+
+    
+
 
 # The main function where we will build the actual app
 def main():
