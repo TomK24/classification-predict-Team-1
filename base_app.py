@@ -106,74 +106,89 @@ def main():
     # Building out the predication page
     if selection == "Make Predictions":
         st.image("https://i.imgur.com/vUdzKY3.png")
-        # Creating a text box for user input
-        tweet_text = st.text_area("Enter Tweet Below⬇️","")
-        upload = st.file_uploader('Upload a csv file here', type='csv', accept_multiple_files=False, key=None, help='Only CSV files are accepted', on_change=None, args=None, kwargs=None)
-        df = None
-        x_pred = None
-        if upload is not None:
-            df = pd.read_csv(upload)
-            processed_df = preprocess2(df)
-            X_pred = processed_df['message']
+        pred_type = st.radio("Predict sentiment of a single tweet or submit a csv for multiple tweets", ('Single tweet', 'Multiple'))
+        if pred_type == 'Single tweet':
+
+            # Creating a text box for user input
+            tweet_text = st.text_area("Enter Tweet Below⬇️","")
+        # upload = st.file_uploader('Upload a csv file here', type='csv', accept_multiple_files=False, key=None, help='Only CSV files are accepted', on_change=None, args=None, kwargs=None)
+        # df = None
+        # x_pred = None
+        # if upload is not None:
+        #     df = pd.read_csv(upload)
+        #     processed_df = preprocess2(df)
+        #     X_pred = processed_df['message']
 
 
-        options = ["Naive Bayes Classifier","Linear Support Vector Classifier", "Multinomial Logistical Regression"]
-        selection = st.selectbox("Choose Your Model😬", options)
+            options = ["Naive Bayes Classifier","Linear Support Vector Classifier", "Multinomial Logistical Regression"]
+            selection = st.selectbox("Choose Your Model😬", options)
 
        
-        if st.button("Classify tweet"):
-            # Transforming user input with vectorizer
-            processed_text = preprocess1(tweet_text)
-            # vect_text = tweet_cv.transform([processed_text]).toarray()
-            # Load your .pkl file with the model of your choice + make predictions
-            # Try loading in multiple models to give the user a choice
-            # predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
-            # prediction = predictor.predict(vect_text)
-            predictor = None
-            if selection == "Naive Bayes Classifier":
-                cnb = pickle.load(open("models+vectors/CNB_model.pkl", 'rb'))
-                predictor = cnb
-            elif selection == "Linear Support Vector Classifier":
-                svc = pickle.load(open("models+vectors/SVC_model.pkl", 'rb'))
-                predictor = svc
-            elif selection == "Multinomial Logistical Regression":
-                mlr = pickle.load(open("models+vectors/MLR_model.pkl", 'rb'))
-                predictor = mlr
-            vect_text = vect.transform([tweet_text]).toarray()
-            prediction = predictor.predict(vect_text)
+            if st.button("Classify tweet"):
+                # Transforming user input with vectorizer
+                processed_text = preprocess1(tweet_text)
+                # vect_text = tweet_cv.transform([processed_text]).toarray()
+                # Load your .pkl file with the model of your choice + make predictions
+                # Try loading in multiple models to give the user a choice
+                # predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+                # prediction = predictor.predict(vect_text)
+                predictor = None
+                if selection == "Naive Bayes Classifier":
+                    cnb = pickle.load(open("models+vectors/CNB_model.pkl", 'rb'))
+                    predictor = cnb
+                elif selection == "Linear Support Vector Classifier":
+                    svc = pickle.load(open("models+vectors/SVC_model.pkl", 'rb'))
+                    predictor = svc
+                elif selection == "Multinomial Logistical Regression":
+                    mlr = pickle.load(open("models+vectors/MLR_model.pkl", 'rb'))
+                    predictor = mlr
+                vect_text = vect.transform([tweet_text]).toarray()
+                prediction = predictor.predict(vect_text)
 
-            # When model has successfully run, will print prediction
-            # You can use a dictionary or similar structure to make this output
-            # more human interpretable.
-            st.success("Text Categorized as: {}".format(prediction))
+                # When model has successfully run, will print prediction
+                # You can use a dictionary or similar structure to make this output
+                # more human interpretable.
+                st.success("Text Categorized as: {}".format(prediction))
+        
+        elif pred_type == 'Multiple':
+            upload = st.file_uploader('Upload a csv file here', type='csv', accept_multiple_files=False, key=None, help='Only CSV files are accepted', on_change=None, args=None, kwargs=None)
+            df_uploaded = None
+            x_pred = None
+            if upload is not None:
+                df_uploaded = pd.read_csv(upload)
+                processed_df = preprocess2(df_uploaded)
+                X_pred = processed_df['message']
+            
+            options = ["Naive Bayes Classifier","Linear Support Vector Classifier", "Multinomial Logistical Regression"]
+            selection = st.selectbox("Choose Your Model😬", options)
 
-        if st.button("Classify csv"):
-            # Transforming user input with vectorizer
-            # processed_text = preprocess1(tweet_text)
-            # vect_text = tweet_cv.transform([processed_text]).toarray()
-            # Load your .pkl file with the model of your choice + make predictions
-            # Try loading in multiple models to give the user a choice
-            # predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
-            # prediction = predictor.predict(vect_text)
-            predictor = None
-            if selection == "Naive Bayes Classifier":
-                cnb = pickle.load(open("models+vectors/CNB_model.pkl", 'rb'))
-                predictor = cnb
-            elif selection == "Linear Support Vector Classifier":
-                svc = pickle.load(open("models+vectors/SVC_model.pkl", 'rb'))
-                predictor = svc
-            elif selection == "Multinomial Logistical Regression":
-                mlr = pickle.load(open("models+vectors/MLR_model.pkl", 'rb'))
-                predictor = mlr
-            vect_text = vect.transform(X_pred)
-            prediction = predictor.predict(vect_text)
-            df['sentiment'] = prediction
-            # When model has successfully run, will print prediction
-            # You can use a dictionary or similar structure to make this output
-            # more human interpretable.
-            st.success("Tweets succesfully classified")
-            st.dataframe(data=df, width=None, height=None)
-            st.download_button(label='Download csv with sentiment predictions', data=df.to_csv(),file_name='sentiment_predictions.csv',mime='text/csv')
+            if st.button("Classify csv"):
+                # Transforming user input with vectorizer
+                # processed_text = preprocess1(tweet_text)
+                # vect_text = tweet_cv.transform([processed_text]).toarray()
+                # Load your .pkl file with the model of your choice + make predictions
+                # Try loading in multiple models to give the user a choice
+                # predictor = joblib.load(open(os.path.join("resources/Logistic_regression.pkl"),"rb"))
+                # prediction = predictor.predict(vect_text)
+                predictor = None
+                if selection == "Naive Bayes Classifier":
+                    cnb = pickle.load(open("models+vectors/CNB_model.pkl", 'rb'))
+                    predictor = cnb
+                elif selection == "Linear Support Vector Classifier":
+                    svc = pickle.load(open("models+vectors/SVC_model.pkl", 'rb'))
+                    predictor = svc
+                elif selection == "Multinomial Logistical Regression":
+                    mlr = pickle.load(open("models+vectors/MLR_model.pkl", 'rb'))
+                    predictor = mlr
+                vect_text = vect.transform(X_pred)
+                prediction = predictor.predict(vect_text)
+                df['sentiment'] = prediction
+                # When model has successfully run, will print prediction
+                # You can use a dictionary or similar structure to make this output
+                # more human interpretable.
+                st.success("Tweets succesfully classified")
+                st.dataframe(data=df, width=None, height=None)
+                st.download_button(label='Download csv with sentiment predictions', data=df.to_csv(),file_name='sentiment_predictions.csv',mime='text/csv')
 
     #Building out the 'EDA' page
     if selection == 'Explore The Data':
