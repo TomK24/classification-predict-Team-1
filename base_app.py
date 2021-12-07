@@ -189,13 +189,14 @@ def main():
                     predictor = mlr
                 vect_text = vect.transform(X_pred)
                 prediction = predictor.predict(vect_text)
-                df['sentiment'] = prediction
+                df_download = df_uploaded.copy()
+                df_download['sentiment'] = prediction
                 # When model has successfully run, will print prediction
                 # You can use a dictionary or similar structure to make this output
                 # more human interpretable.
                 st.success("Tweets succesfully classified")
-                st.dataframe(data=df, width=None, height=None)
-                st.download_button(label='Download csv with sentiment predictions', data=df.to_csv(),file_name='sentiment_predictions.csv',mime='text/csv')
+                st.dataframe(data=df_download, width=None, height=None)
+                st.download_button(label='Download csv with sentiment predictions', data=df_download.to_csv(),file_name='sentiment_predictions.csv',mime='text/csv')
     #Building out 'Model Explination' page
     if selection == "Model Explinations":
         st.image("https://i.imgur.com/MDxSN4d.png")
