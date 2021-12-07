@@ -104,7 +104,7 @@ def main():
     # Creating sidebar with selection box -
     # you can create multiple pages this way
     options = ["Make Predictions","Model Explanations", "Explore The Data"]
-    st.sidebar.image("https://im2.ezgif.com/tmp/ezgif-2-82ee7956e31c.gif")
+    st.sidebar.image("https://i.imgur.com/F7YegD6.gif")
     selection = st.sidebar.selectbox("Choose Option Below⬇️", options)
     # Creating a page with m
     #Building out the 'About This App' page
