@@ -88,7 +88,11 @@ def preprocess2(data):
     data['message'] = data['message'].str.lower()
     data['message'] = data['message'].apply(remove_weird_chars)
     return data
-
+# Create a dictionary for tweet prediction outputs
+dictionary_tweets = {'[-1]': "Not supporting man-made climate change",
+                     '[0]': "Neither supporting nor refuting the belief of man-made climate change",
+                     '[1]': "Being pro climate change",
+                     '[2]': "Linking factual news about climate change"}
     
 
 
@@ -99,13 +103,14 @@ def main():
     # these are static across all pages
     # Creating sidebar with selection box -
     # you can create multiple pages this way
-    options = ["Make Predictions","Explore The Data", "Model Information"]
-    selection = st.sidebar.selectbox("Choose Option", options)
+    options = ["Make Predictions","Model Explinations", "Explore The Data"]
+    st.sidebar.video("https://i.imgur.com/ouG8nEu.mp4")
+    selection = st.sidebar.selectbox("Choose Option Below⬇️", options)
     # Creating a page with m
     #Building out the 'About This App' page
     # Building out the predication page
     if selection == "Make Predictions":
-        st.image("https://i.imgur.com/vUdzKY3.png")
+        st.image("https://i.imgur.com/wZdJqho.png")
         pred_type = st.radio("Predict sentiment of a single tweet or submit a csv for multiple tweets", ('Single tweet', 'Multiple'))
         if pred_type == 'Single tweet':
 
@@ -143,12 +148,14 @@ def main():
                     mlr = pickle.load(open("models+vectors/MLR_model.pkl", 'rb'))
                     predictor = mlr
                 vect_text = vect.transform([tweet_text]).toarray()
+
                 prediction = predictor.predict(vect_text)
+                prediction_str = np.array_str(prediction)
 
                 # When model has successfully run, will print prediction
                 # You can use a dictionary or similar structure to make this output
                 # more human interpretable.
-                st.success("Text Categorized as: {}".format(prediction))
+                st.success("Tweet Categorized as: {}".format(dictionary_tweets[prediction_str]))
         
         elif pred_type == 'Multiple':
             upload = st.file_uploader('Upload a csv file here', type='csv', accept_multiple_files=False, key=None, help='Only CSV files are accepted', on_change=None, args=None, kwargs=None)
@@ -189,14 +196,36 @@ def main():
                 st.success("Tweets succesfully classified")
                 st.dataframe(data=df, width=None, height=None)
                 st.download_button(label='Download csv with sentiment predictions', data=df.to_csv(),file_name='sentiment_predictions.csv',mime='text/csv')
+    #Building out 'Model Explination' page
+    if selection == "Model Explinations":
+        st.image("https://i.imgur.com/MDxSN4d.png")
+        options = ["Multinomial Logistical Regression Model","Linear Support Vector Classifier Model", "Naive Bayes Classifier Model"]
+        selection = st.selectbox("Which model would you like to learn more about?", options)
+        if selection == "Multinomial Logistical Regression Model":
+            st.info("This model doesn't do particuraly well at predicting tweets that have a neutral or negative sentiment")
+            st.markdown("Logistic regression is a statistical analysis method used to predict a data value based on prior observations of a data set. ")
+            st.markdown("A multinomial logistic regression model predicts two or more dependent variables by analyzing the relationship between one or more existing independent variables.")
+            st.image("https://miro.medium.com/max/1400/1*dVsfG6i-Y93prmLgTcxRwA.jpeg")
+        if selection == "Linear Support Vector Classifier Model":
+            st.info("This model is the best overall and does the best at predicting each of the sentiments")
+            st.markdown("The goal of the SVM algorithm is to create the best line or decision boundary that can seperate multi dimensional space into classes so that we can easily put the new data point in the correct category in the future. This best decision boundary is called a hyperplane.")
+            st.markdown("SVM chooses the extreme points/vectors that help in creating the hyperplane. These extreme cases are called as support vectors, and hence the algorithm is termed as Support Vector Machine.")
+            st.image("https://static.javatpoint.com/tutorial/machine-learning/images/support-vector-machine-algorithm.png")
+        if selection == "Naive Bayes Classifier Model":
+            st.info("This model is better than the Multinomial Logistical Regression Model at predicting tweets that have a neutral or negative sentiment.")
+            st.markdown("Naive Bayes classifier assumes that the presence of a particular independent variable in a set is unrelated to the presence of any other independent variable.")
+            st.markdown("For example, a fruit may be thought to be an apple if it is red/green, round, and about 7.5cm in diameter. Even if these variables depend on each other or upon the existence of the other variables, all of these properties independently contribute to the probability that this fruit is an apple and that is why it is known as ‘Naive’.")
+            st.image("https://miro.medium.com/max/468/1*IGwM9cb8W-gyJW5rkiVQPw.jpeg")
+
+
+
+
+       
+
 
     #Building out the 'EDA' page
     if selection == 'Explore The Data':
-        st.title("Explore the Data!")
-        st.image("https://imgur.com/j8EXXWA.jpg")
-        st.sidebar.subheader("Exploring The Data")
-        st.image("https://static.thenounproject.com/png/2321738-200.png")
-        st.markdown("Click the boxes on the side panel to explore the dataset.")
+        st.image("https://i.imgur.com/Ce2r5oh.png")
         if st.sidebar.checkbox('Dataset'):
             st.subheader('Overview of dataset:')
             st.write(df.head())
@@ -219,18 +248,6 @@ def main():
             if selection == "Top hashtags in anti sentiment":
                 st.subheader('Bar graph depicting popular hashtag words for anti sentiment')
                 st.image("https://i.imgur.com/03DU2hR.png")	
-    # Building out the "Information" page
-    if selection == "Model Information": 
-        st.info("General Information")
-        # You can read a markdown file from supporting resources folder
-        st.markdown("Some information here")
-
-        st.subheader("Raw Twitter data and label")
-        if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-           st.write(raw[['sentiment', 'message']]) # will write the df to the page
-
-    
-
 # Required to let Streamlit instantiate our web app.
 if __name__ == '__main__':
     main()        
