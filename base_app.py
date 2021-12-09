@@ -259,7 +259,7 @@ def main():
                 st.image("https://i.imgur.com/fc0Aa9l.png")	
                 st.markdown("These tweets contain words such as hoax, fake, scam this would be popular words used by users who don't believe in climate change.")
         if option == 'Top hashtags in different tweet sentiments':
-            options = ["Top hashtags in news sentiment","Top hashtags in pro sentiment", "Top hashtags for neutral sentiment", "Top hashtags for anti sentiment."]
+            options = ["Top hashtags in news sentiment","Top hashtags in pro sentiment", "Top hashtags for neutral sentiment", "Top hashtags for anti sentiment"]
             selection = st.selectbox("Choose sentiment to view", options)
             if selection == "Top hashtags in news sentiment":
                 st.subheader('Bar graph depicting popular hashtag words for news sentiment')
